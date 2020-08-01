@@ -369,6 +369,10 @@ void step1::Loop(TString inTreeName, TString outTreeName )
    outputTree->Branch("triggerXSF",&triggerXSF,"triggerXSF/F");
    outputTree->Branch("triggerVlqXSF",&triggerVlqXSF,"triggerVlqXSF/F");
    outputTree->Branch("isoSF",&isoSF,"isoSF/F");
+   outputTree->Branch("njetsWeight",&njetsWeight,"njetsWeight/F");
+   outputTree->Branch("njetsWeightUp",&njetsWeightUp,"njetsWeightUp/F");
+   outputTree->Branch("njetsWeightDown",&njetsWeightDown,"njetsWeightDown/F");
+   outputTree->Branch("tthfWeight",&tthfWeight,"tthfWeight/F");
    
    //ttbar generator
    outputTree->Branch("ttbarMass_TTbarMassCalc",&ttbarMass_TTbarMassCalc,"ttbarMass_TTbarMassCalc/D");
@@ -821,6 +825,19 @@ void step1::Loop(TString inTreeName, TString outTreeName )
 		}
       }
 
+      // ----------------------------------------------------------------------------
+      // ttHF weight calculation
+      // ----------------------------------------------------------------------------
+      njetsWeight = hardcodedConditions.GetNjetSF(NJets_JetSubCalc, Year, "nominal", isTT);
+      njetsWeightUp = hardcodedConditions.GetNjetSF(NJets_JetSubCalc, Year, "up", isTT);
+      njetsWeightDown = hardcodedConditions.GetNjetSF(NJets_JetSubCalc, Year, "down", isTT);
+   
+
+      // ----------------------------------------------------------------------------
+      // njet weight calculation
+      // ----------------------------------------------------------------------------
+      tthfWeight = hardcodedConditions.GetTtHfSF(isTT, outTTBB, outTT2B||outTT1B||outTTCC||outTTLF);
+  
       // ----------------------------------------------------------------------------
       // Generator-level HT correction
       // ----------------------------------------------------------------------------      

@@ -29,6 +29,9 @@ public:
     double GetMuonTriggerXSF(double pt, double eta, int year = 2017);
     double GetMuonTriggerVlqXSF(double pt, double eta, int year = 2017);
 
+    float GetNjetSF(int njet, int year, std::string variation, bool isTT);
+    float GetTtHfSF(bool isTT, bool isTTHF, bool isTTLF);
+
     void GetBtaggingSF(double pt, double eta, double *btagsf, double *btagsfunc, std::string tagger="CSVM", int jetHFlav = 5, int year = 2017);
     void GetBtaggingEff(double pt, double *eff, std::string tagger="CSVM", int jetHFlav = 5, int year = 2017);
     void GetHOTtaggingSF(double pt, int njet, double *hotsf, double *hotstatunc, double *hotcspurunc, double *hotclosureunc, int year = 2017, bool isGenMatched=true, std::string workingpoint = "1pfake");
