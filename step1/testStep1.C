@@ -11,7 +11,7 @@ void testStep1(){
   TString outputFile="test.root";
   Int_t Year=2018;
   
-  gSystem->AddIncludePath("-I$CMSSW_BASE/src/");
+  // gSystem->AddIncludePath("-I$CMSSW_BASE/src/");
   
   if ( inputFile.Contains("Run2017") || inputFile.Contains("Run2018") || inputFile.Contains("Single") || inputFile.Contains("Double") || inputFile.Contains("MuonEG") || inputFile.Contains("EGamma") || inputFile.Contains("JetHT") ) { 
     step1 t(inputFile,outputFile.ReplaceAll(".root","nominal.root"),Year);

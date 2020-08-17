@@ -15,8 +15,11 @@
 #include <TH3.h>
 #include "HardcodedConditions.h"
 #include "BTagCalibForLJMet.h"
+#include <chrono> 
+
 
 using namespace std;
+using namespace std::chrono; 
 
 // ----------------------------------------------------------------------------
 // Define functions
@@ -77,28 +80,69 @@ wgthist->Write();
 // MAIN EVENT LOOP
 // ----------------------------------------------------------------------------
 
-void step1::Loop(TString inTreeName, TString outTreeName ) 
+void step1::Loop(TString inTreeName, TString outTreeName, const BTagCalibrationForLJMet* calib = NULL) 
 {
   // btagCalibration initialization -csv reshaping
-  std::string btagcsvfile("DeepCSV_94XSF_V5_B_F.csv");
-  if (Year== 2018) {
+  
+
+  auto start = high_resolution_clock::now();
+
+  auto startstop0 = high_resolution_clock::now();
+
+  if (calib == NULL)
+  {
+    std::string btagcsvfile("DeepCSV_94XSF_V5_B_F.csv");
+    if (Year== 2018) {
       btagcsvfile = "DeepCSV_102XSF_V2.csv"; 
+    }
+    cout << "CSV reshaping file " << btagcsvfile << endl;
+    calib = new const BTagCalibrationForLJMet("DeepCSV", btagcsvfile); 
   }
-  cout << "CSV reshaping file " << btagcsvfile << endl;
-  BTagCalibrationForLJMet calib("DeepCSV", btagcsvfile);
+
+  auto startstop1 = high_resolution_clock::now();
+
   BTagCalibrationForLJMetReader reader(BTagEntryForLJMet::OP_RESHAPING,  // operating point
 			       "central",             // central sys type
+          // {"up_lf", "down_lf", "up_hf", "down_hf"}); 
 			       {"up_jes", "down_jes", "up_lf", "down_lf", "up_hfstats1", "down_hfstats1",
 				   "up_hfstats2", "down_hfstats2", "up_cferr1", "down_cferr1", "up_cferr2",
 				   "down_cferr2", "up_hf", "down_hf", "up_lfstats1", "down_lfstats1",
 				   "up_lfstats2", "down_lfstats2"});      // other sys types
   
-  reader.load(calib,                 // calibration instance
+  auto startstop2 = high_resolution_clock::now();
+
+  reader.load(*calib,                 // calibration instance
 	      BTagEntryForLJMet::FLAV_B,     // btag flavour
 	      "iterativefit");       // measurement type
-  reader.load(calib, BTagEntryForLJMet::FLAV_C, "iterativefit");     // for FLAV_C
-  reader.load(calib, BTagEntryForLJMet::FLAV_UDSG, "iterativefit");     // for FLAV_UDSG
 
+  auto startstop3 = high_resolution_clock::now();
+
+  reader.load(*calib, BTagEntryForLJMet::FLAV_C, "iterativefit");     // for FLAV_C
+
+  auto startstop4 = high_resolution_clock::now();
+
+  reader.load(*calib, BTagEntryForLJMet::FLAV_UDSG, "iterativefit");     // for FLAV_UDSG
+
+  auto startstop5 = high_resolution_clock::now();
+
+  auto duration01 = duration_cast<milliseconds>(startstop1 - startstop0);
+  auto duration12 = duration_cast<milliseconds>(startstop2 - startstop1);
+  auto duration23 = duration_cast<milliseconds>(startstop3 - startstop2);
+  auto duration34 = duration_cast<milliseconds>(startstop4 - startstop3);
+  auto duration45 = duration_cast<milliseconds>(startstop5 - startstop4); 
+
+  cout <<"calib init "<< duration01.count() << endl;
+  cout <<"reader init "<< duration12.count() << endl;
+  cout <<"reader load FLAV_B "<< duration23.count() << endl;
+  cout <<"reader load FLAV_C "<< duration34.count() << endl;
+  cout <<"reader load FLAV_UDSG "<< duration45.count() << endl;
+
+ auto stop = high_resolution_clock::now(); 
+
+ auto duration = duration_cast<seconds>(stop - start);  
+ cout << duration.count() << endl;
+
+start = high_resolution_clock::now();
 
   HardcodedConditions hardcodedConditions;
   
@@ -735,6 +779,11 @@ void step1::Loop(TString inTreeName, TString outTreeName )
 
    Long64_t nbytes = 0, nb = 0;
    for (Long64_t jentry=0; jentry<nentries;jentry++) {
+
+      if (jentry == 2)
+        break;
+    //cout <<"event"<<endl;
+      auto start3 = high_resolution_clock::now();
       Long64_t ientry = LoadTree(jentry);
       if (ientry < 0) break;
       nb = inputTree->GetEntry(jentry);   nbytes += nb;
@@ -980,6 +1029,9 @@ void step1::Loop(TString inTreeName, TString outTreeName )
 		AK4JetBTag_lSFdn_MultiLepCalc->at(ijet) = applySF(istagged,btagSF-btagSFerr,btagEff);
 		}
 	// csv reshaping
+
+   auto start2 = high_resolution_clock::now(); 
+
 	double csv = AK4JetDeepCSVb_MultiLepCalc->at(ijet) + AK4JetDeepCSVbb_MultiLepCalc->at(ijet);
 	double jptForBtag(ijetPt>1000. ? 999. : ijetPt), jetaForBtag(fabs(ijetEta));
 	float csvWgt(1.0), csvWgt_hfup(1.0), csvWgt_hfdn(1.0), csvWgt_lfup(1.0), csvWgt_lfdn(1.0);
@@ -1006,6 +1058,13 @@ void step1::Loop(TString inTreeName, TString outTreeName )
 	if (csvWgt_hfdn != 0) btagCSVWeight_HFdn *= csvWgt_hfdn;
         if (csvWgt_lfup != 0) btagCSVWeight_LFup *= csvWgt_lfup;
         if (csvWgt_lfdn != 0) btagCSVWeight_LFdn *= csvWgt_lfdn;
+
+
+  auto stop2 = high_resolution_clock::now();
+  auto duration2 = duration_cast<microseconds>(stop2 - start2); 
+   // if (jentry%100==0) 
+ //cout <<"jet:"<< duration2.count() << endl;
+
 	}
 
 	else{
@@ -2310,6 +2369,11 @@ void step1::Loop(TString inTreeName, TString outTreeName )
       // ----------------------------------------------------------------------------
       
       outputTree->Fill();
+
+        auto stop3 = high_resolution_clock::now();
+  auto duration3 = duration_cast<microseconds>(stop3 - start3); 
+   // if (jentry%100==0) 
+ //cout <<"event:"<< duration3.count() << endl;
    }
    std::cout<<"Nelectrons      = "<<Nelectrons<<" / "<<nentries<<std::endl;
    std::cout<<"Npassed_ElEta   = "<<npass_ElEta<<" / "<<nentries<<std::endl;
@@ -2329,5 +2393,10 @@ void step1::Loop(TString inTreeName, TString outTreeName )
    delete poly2;
    delete poly2U;
    delete poly2D;
+
+stop = high_resolution_clock::now(); 
+
+ duration = duration_cast<seconds>(stop - start);  
+ cout << duration.count() << endl;
 
 }

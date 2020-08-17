@@ -12,7 +12,7 @@ start_time = time.time()
 #inputDir='/eos/uscms/store/user/lpcljm/FWLJMET102X_1lep2017_052219/' # or 2018
 inputDir='/eos/uscms/store/user/lpcljm/FWLJMET102X_1lep2017_Oct2019/' # or 2018
 outputDir='/mnt/hadoop/store/group/bruxljm/FWLJMET102X_1lep2017_4t_12142019_step1/nominal/' # or 2018
-condorDir='/home/wzhang/work/fwljmet_201905/CMSSW_10_2_16_UL/src/LJMet-Slimmer-4tops/step1/FWLJMET102X_1lep2017_4t_12142019_logs/' # or 2018
+condorDir='/home/eusai/4t/LJMet-Slimmer-4tops/step1/condor/' # or 2018
 Year = 2017 # or 2018
 finalStateYear = 'singleLep'+str(Year)
 shifts = ['JECup','JECdown','JERup','JERdown']
@@ -195,8 +195,8 @@ Arguments = "%(FILENAME)s %(OUTFILENAME)s %(INPUTDIR)s/%(SAMPLE)s/%(INPATHSUFFIX
 Queue 1"""%dict)
                     jdf.close()
                     os.chdir('%s/%s'%(condorDir,outsample))
-                    os.system('condor_submit %(OUTFILENAME)s_%(ID)s.job'%dict)
-                    os.system('sleep 0.5')                                
+                    # os.system('condor_submit %(OUTFILENAME)s_%(ID)s.job'%dict)
+                    # os.system('sleep 0.5')                                
                     os.chdir('%s'%(runDir))
                     print count, "jobs submitted!!!"
         

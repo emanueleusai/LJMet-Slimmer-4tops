@@ -289,8 +289,8 @@ Arguments = "%(FILENAME)s %(OUTFILENAME)s %(INPUTDIR)s/%(SAMPLE)s/%(INPATHSUFFIX
 Queue 1"""%dict)
                     jdf.close()
                     os.chdir('%s/%s'%(condorDir,outsample))
-                    os.system('condor_submit %(OUTFILENAME)s_%(ID)s.job'%dict)
-                    os.system('sleep 0.5')                                
+                    # os.system('condor_submit %(OUTFILENAME)s_%(ID)s.job'%dict)
+                    # os.system('sleep 0.5')                                
                     os.chdir('%s'%(runDir))
                     print count, "jobs submitted!!!"
         
