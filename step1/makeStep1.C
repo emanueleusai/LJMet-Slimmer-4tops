@@ -1,3 +1,4 @@
+#include <TSystem.h>
 #include "step1.cc"
 #include "BTagCalibForLJMet.cpp"
 #include "HardcodedConditions.cc"
@@ -88,6 +89,9 @@ void makeStep1(TString macroDir, string filelist, Int_t Year){
           outputFile.ReplaceAll(shifts[i],".root"); //Change outputFile back to its original name.
         }
       }
+
+      break;
+
     }
   }
   else cout << "Unable to open filelist"; 
